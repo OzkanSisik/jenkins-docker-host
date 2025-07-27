@@ -54,7 +54,7 @@ Your Jenkins configuration, jobs, and plugins are stored in Docker volumes. They
 
 To start completely fresh:
 ```bash
-./scripts/cleanup-jenkins.sh  # Answer 'y' to delete data
+./scripts/cleanup-jenkins.sh 
 ./start-jenkins.sh
 ```
 
@@ -72,5 +72,5 @@ To start completely fresh:
 - Ensure the container has the right group membership: `docker-compose exec jenkins id`
 
 **Clean slate:**
-- Remove everything: `./scripts/cleanup-jenkins.sh` (answer 'y' to delete data)
+- Remove everything: `./scripts/cleanup-jenkins.sh`
 - Rebuild: `./start-jenkins.sh`
