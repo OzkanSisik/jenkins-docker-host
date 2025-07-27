@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# Simple script to detect Docker socket GID and create .env file
-# for use with docker-compose
-
 set -euo pipefail
 
 echo "🔍 Detecting Docker socket GID..."
@@ -19,21 +16,17 @@ detect_docker_gid() {
         if [[ -S "$socket_path" ]]; then
             echo "✅ Found Docker socket at: $socket_path"
             
-            # Get the GID of the socket file (follow symlinks)
+            # Get the GID of the socket file
             if [[ "$OSTYPE" == "darwin"* ]]; then
-                # macOS - follow symlinks with -L
                 DOCKER_GID=$(stat -L -f %g "$socket_path")
             else
-                # Linux - follow symlinks with -L
                 DOCKER_GID=$(stat -L -c %g "$socket_path")
             fi
             
             echo "📋 Docker socket GID: $DOCKER_GID"
             
-            # Export so that scripts sourcing this file can use it immediately
             export DOCKER_GID
-            
-            # Create .env file
+
             echo "DOCKER_GID=$DOCKER_GID" > .env
             echo "✅ Created .env file with DOCKER_GID=$DOCKER_GID"
             

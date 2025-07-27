@@ -13,9 +13,12 @@ instance.setInstallState(InstallState.INITIAL_SETUP_COMPLETED)
 if (instance.getSecurityRealm() == null) {
     println "First boot detected - setting up admin user and security"
     
+    // Get admin password from environment variable or use default
+    def adminPassword = System.getenv("JENKINS_ADMIN_PASSWORD") ?: "changeme123!"
+    
     // Create admin user
     def hudsonRealm = new HudsonPrivateSecurityRealm(false)
-    hudsonRealm.createAccount("admin", "admin123")
+    hudsonRealm.createAccount("admin", adminPassword)
     instance.setSecurityRealm(hudsonRealm)
 
     // Set authorization strategy - Matrix-based security (restrictive)
@@ -29,10 +32,8 @@ if (instance.getSecurityRealm() == null) {
 
     // Save configuration
     instance.save()
-    
+
     println "Jenkins security configuration completed!"
-    println "Username: admin"
-    println "Password: admin123"
 } else {
     println "Jenkins already configured - skipping security setup"
 }

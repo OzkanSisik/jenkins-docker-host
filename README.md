@@ -1,72 +1,68 @@
 # Jenkins Docker Host
 
-Run Jenkins in Docker while giving it access to your host's Docker daemon. This setup works across different operating systems without manual configuration.
-
-## What This Solves
-
-Running Jenkins in Docker is great, but getting it to talk to Docker on the host can be tricky. Different systems use different group IDs for the Docker socket:
-- macOS: usually group ID 20 (staff)
-- Linux: varies by distribution (often 998, 999, or others)
-- CI environments: who knows?
-
-This project automatically figures out the right group ID and configures Jenkins accordingly.
+Run Jenkins in Docker with access to your host's Docker daemon. Works on any platform without messing with group IDs.
 
 ## Features
 
-- **Cross-platform**: Works on macOS, Linux, and CI runners without changes
-- **Automatic detection**: Finds your Docker socket's group ID at runtime
-- **No Docker-in-Docker**: Uses the host's Docker daemon directly
-- **Simple startup**: One command gets everything running
+- **Cross-platform** - macOS, Linux, CI runners  
+- **Zero configuration** - Detects Docker socket automatically
+- **Host Docker access** - No Docker-in-Docker complexity
+- **One command setup** - `./start-jenkins.sh` and you're done
 
-## Getting Started
+## The Problem
 
-1. **Clone and enter the directory:**
-   ```bash
-   git clone git@github.com:OzkanSisik/jenkins-docker-host.git
-   cd jenkins-docker-host
-   ```
+Different systems use different group IDs for the Docker socket (macOS uses 20, various Linux distros use 998/999/etc). Hard-coding these breaks portability.
 
-2. **Start Jenkins:**
-   ```bash
-   ./start-jenkins.sh
-   ```
-   
-   This script will:
-   - Detect your Docker socket's group ID
-   - Build a custom Jenkins image with the right permissions
-   - Start Jenkins with Docker access
+## The Solution
 
-3. **Verify it's working:**
-   ```bash
-   docker-compose exec jenkins docker ps
-   ```
-   
-   If you see a list of containers, Jenkins can access Docker!
+This setup automatically detects your Docker socket's group ID and builds Jenkins accordingly. No manual configuration needed.
 
-4. **Open Jenkins:**
-   Navigate to [http://localhost:8080](http://localhost:8080) in your browser.
+## Quick Start
+
+```bash
+git clone git@github.com:OzkanSisik/jenkins-docker-host.git
+cd jenkins-docker-host
+./start-jenkins.sh
+```
+
+That's it. Jenkins will be running at http://localhost:8080 with Docker access.
+
+**Default login:** admin / changeme123!
+
+**Custom password:**
+```bash
+JENKINS_ADMIN_PASSWORD="your_password" ./start-jenkins.sh
+```
+
+## Verify It Works
+
+```bash
+docker-compose exec jenkins docker ps
+```
+
+You should see your host's containers listed.
 
 ## How It Works
 
-The setup uses three main components:
+1. `detect-docker-gid.sh` finds your Docker socket and reads its group ID
+2. Dockerfile creates Jenkins with Docker CLI and adds the user to the right group  
+3. Jenkins starts with access to your host's Docker daemon
 
-- **`detect-docker-gid.sh`**: Scans common Docker socket locations and extracts the group ID
-- **`Dockerfile`**: Builds Jenkins with Docker CLI and adds the user to the correct group
-- **`start-jenkins.sh`**: Orchestrates the whole process
+## Persistent Data
 
-## Security Considerations
+Your Jenkins configuration, jobs, and plugins are stored in Docker volumes. They'll survive restarts and rebuilds.
 
-⚠️ **Important**: This setup mounts the Docker socket into the Jenkins container. This means:
-- Jenkins can control Docker on your host
-- Anyone with Jenkins access can run Docker commands
-- Consider this when setting up authentication and access controls
+To start completely fresh:
+```bash
+./scripts/cleanup-jenkins.sh  # Answer 'y' to delete data
+./start-jenkins.sh
+```
 
-On some systems, the Docker socket might be world-writable. For production use, you may want to restrict permissions further.
+## Notes
 
-## Customization
-
-- **Initial setup**: Add Groovy scripts to `init.groovy.d/` for automated Jenkins configuration
-- **Persistent data**: Jenkins data is stored in named volumes and will persist between restarts
+- The Docker socket is mounted into Jenkins - anyone with Jenkins access can control Docker
+- Admin password can only be set on first run (change it later in Jenkins UI if needed)
+- Default password is fine for development, use your own for anything serious
 
 ## Troubleshooting
 
@@ -76,5 +72,5 @@ On some systems, the Docker socket might be world-writable. For production use, 
 - Ensure the container has the right group membership: `docker-compose exec jenkins id`
 
 **Clean slate:**
-- Remove everything: `docker-compose down -v --rmi local`
+- Remove everything: `./scripts/cleanup-jenkins.sh` (answer 'y' to delete data)
 - Rebuild: `./start-jenkins.sh`

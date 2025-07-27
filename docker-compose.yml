@@ -19,6 +19,7 @@ services:
       - ./init.groovy.d:/var/jenkins_home/init.groovy.d:ro
     environment:
       - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+      - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD}
 
     networks:
       - jenkins-network
