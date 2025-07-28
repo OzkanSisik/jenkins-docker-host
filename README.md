@@ -64,6 +64,15 @@ To start completely fresh:
 - Admin password can only be set on first run (change it later in Jenkins UI if needed)
 - Default password is fine for development, use your own for anything serious
 
+## Security Context
+
+This setup works well for **local development** when you're the only user. The Docker socket access is a common pattern for personal projects and development environments.
+
+**For better security**, you can improve this setup with:
+
+- **Kubernetes with build agents** - isolated build environments
+- **Remote Docker daemon** - keep Docker separate from Jenkins  
+
 ## Troubleshooting
 
 **Jenkins can't access Docker:**
