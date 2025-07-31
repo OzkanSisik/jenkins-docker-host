@@ -8,28 +8,21 @@ services:
         DOCKER_GID: ${DOCKER_GID}
     container_name: jenkins-ci
     restart: unless-stopped
+    environment:
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
+      - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD}
     ports:
       - "8080:8080"
       - "50000:50000"
     volumes:
       - jenkins_home:/var/jenkins_home
       - jenkins_data:/var/jenkins_data
-      - /var/run/docker.sock:/var/run/docker.sock
       - ~/.ssh:/var/jenkins_home/.ssh:ro
       - ./init.groovy.d:/var/jenkins_home/init.groovy.d:ro
-    environment:
-      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
-      - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD}
-
-    networks:
-      - jenkins-network
+      - /var/run/docker.sock:/var/run/docker.sock
 
 volumes:
   jenkins_home:
     driver: local
   jenkins_data:
     driver: local
-
-networks:
-  jenkins-network:
-    driver: bridge

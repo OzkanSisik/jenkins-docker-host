@@ -23,7 +23,7 @@ RUN apt-get update && \
 RUN curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
     chmod +x /usr/local/bin/docker-compose
 
-# Ensure jenkins user is in a group that matches the host's Docker socket GID
+# Create docker group with the specified GID and add jenkins user to it
 # If a group with that GID already exists (e.g., "staff" on macOS), reuse it;
 # otherwise create a dedicated group called docker-host.
 RUN set -eux; \

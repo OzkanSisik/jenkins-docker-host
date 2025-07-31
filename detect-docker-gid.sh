@@ -22,7 +22,7 @@ detect_docker_gid() {
             else
                 DOCKER_GID=$(stat -L -c %g "$socket_path")
             fi
-            
+
             echo "📋 Docker socket GID: $DOCKER_GID"
             
             export DOCKER_GID
